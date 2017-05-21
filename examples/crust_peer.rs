@@ -536,30 +536,41 @@ fn parse_user_command(cmd: &str) -> Option<UserCommand> {
         }
     };
 
-    if matches.is_present("connect") {
-        let matches = unwrap!(matches.subcommand_matches("connect"));
-        let our_info_id = unwrap!(matches.value_of("our-info-id"), "Missing our_info_id");
-        let their_info = unwrap!(matches.value_of("their-info"), "Missing their_info");
-        Some(UserCommand::Connect(our_info_id.to_string(), their_info.to_string()))
-    } else if matches.is_present("send") {
-        let matches = unwrap!(matches.subcommand_matches("send"));
-        let peer: usize = unwrap!(unwrap!(matches.value_of("peer"), "Missing peer").parse(),
-                                  "expected number for <peer>");
-        let msg = unwrap!(matches.value_of("message"), "Missing message");
-        Some(UserCommand::Send(peer, msg.to_string()))
-    } else if matches.is_present("send-all") {
-        let msg = unwrap!(matches.value_of("message"), "Missing message");
-        Some(UserCommand::SendAll(msg.to_string()))
-    } else if matches.is_present("prepare-connection-info") {
-        Some(UserCommand::PrepareConnectionInfo)
-    } else if matches.is_present("list") {
-        Some(UserCommand::List)
-    } else if matches.is_present("stop") {
-        Some(UserCommand::Stop)
-    } else if matches.is_present("help") {
-        println!("{}", help_message);
-        None
-    } else {
-        None
+    match {
+
+        matches.is_present("connect") => {
+            let matches = unwrap!(matches.subcommand_matches("connect"));
+            let our_info_id = unwrap!(matches.value_of("our-info-id"), "Missing our_info_id");
+            let their_info = unwrap!(matches.value_of("their-info"), "Missing their_info");
+            Some(UserCommand::Connect(our_info_id.to_string(), their_info.to_string()))
+        }
+
+        matches.is_present("send") => {
+            let matches = unwrap!(matches.subcommand_matches("send"));
+            let peer: usize = unwrap!(unwrap!(matches.value_of("peer"), "Missing peer").parse(),
+                                      "expected number for <peer>");
+            let msg = unwrap!(matches.value_of("message"), "Missing message");
+            Some(UserCommand::Send(peer, msg.to_string()))
+        }
+
+        matches.is_present("send-all") => {
+            let msg = unwrap!(matches.value_of("message"), "Missing message");
+            Some(UserCommand::SendAll(msg.to_string()))
+        }
+
+        matches.is_present("prepare-connection-info") => Some(UserCommand::PrepareConnectionInfo)
+
+        matches.is_present("list") => Some(UserCommand::List)
+
+        matches.is_present("stop") => Some(UserCommand::Stop)
+
+        matches.is_present("help") => {
+            println!("{}", help_message);
+            None
+        }
+
+        _ => None
+
     }
+
 }
